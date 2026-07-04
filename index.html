@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ครัวอิ่มอร่อย — สั่งอาหารออนไลน์</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', 'Sarabun', system-ui, sans-serif;
+    background: #fef6ee;
+    color: #3a2e26;
+    line-height: 1.5;
+  }
+  header {
+    background: #e8641e;
+    color: #fff;
+    padding: 20px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+  }
+  header h1 { font-size: 22px; display: flex; align-items: center; gap: 8px; }
+  .cart-btn {
+    background: #fff;
+    color: #e8641e;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 30px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: transform .15s;
+  }
+  .cart-btn:active { transform: scale(0.95); }
+  .cart-count {
+    background: #e8641e;
+    color: #fff;
+    border-radius: 50%;
+    min-width: 22px;
+    height: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    padding: 0 5px;
+  }
+  main { max-width: 1000px; margin: 0 auto; padding: 24px 16px 60px; }
+  .section-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 28px 0 14px;
+    color: #c9531a;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 2px dashed #f0c9a8;
+    padding-bottom: 8px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 14px;
+  }
+  .card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    display: flex;
+    flex-direction: column;
+    transition: transform .15s, box-shadow .15s;
+  }
+  .card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,0.1); }
+  .card .emoji { font-size: 40px; margin-bottom: 6px; }
+  .card h3 { font-size: 16px; margin-bottom: 4px; }
+  .card .desc { font-size: 13px; color: #8a7a6d; margin-bottom: 10px; flex: 1; }
+  .card .bottom { display: flex; justify-content: space-between; align-items: center; }
+  .price { font-size: 18px; font-weight: 700; color: #e8641e; }
+  .add-btn {
+    background: #e8641e;
+    color: #fff;
+    border: none;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    font-size: 22px;
+    cursor: pointer;
+    transition: transform .15s, background .15s;
+  }
+  .add-btn:hover { background: #c9531a; }
+  .add-btn:active { transform: scale(0.85); }
+
+  /* Cart Drawer */
+  .overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.4);
+    opacity: 0; visibility: hidden;
+    transition: .25s;
+    z-index: 90;
+  }
+  .overlay.open { opacity: 1; visibility: visible; }
+  .cart-drawer {
+    position: fixed;
+    top: 0; right: -420px;
+    width: 400px; max-width: 90vw;
+    height: 100%;
+    background: #fff;
+    z-index: 100;
+    box-shadow: -4px 0 20px rgba(0,0,0,0.15);
+    transition: right .3s cubic-bezier(.4,0,.2,1);
+    display: flex;
+    flex-direction: column;
+  }
+  .cart-drawer.open { right: 0; }
+  .cart-header {
+    padding: 20px;
+    background: #e8641e;
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .cart-header h2 { font-size: 19px; }
+  .close-btn {
+    background: none; border: none; color: #fff;
+    font-size: 26px; cursor: pointer; line-height: 1;
+  }
+  .cart-items { flex: 1; overflow-y: auto; padding: 12px 16px; }
+  .cart-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0e6dc;
+  }
+  .cart-item .ci-emoji { font-size: 28px; }
+  .cart-item .ci-info { flex: 1; }
+  .cart-item .ci-name { font-size: 14px; font-weight: 600; }
+  .cart-item .ci-price { font-size: 13px; color: #8a7a6d; }
+  .qty-ctrl { display: flex; align-items: center; gap: 8px; }
+  .qty-ctrl button {
+    width: 28px; height: 28px;
+    border: 1px solid #e8641e;
+    background: #fff; color: #e8641e;
+    border-radius: 8px;
+    font-size: 16px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .qty-ctrl button:active { background: #fdece0; }
+  .qty-ctrl span { min-width: 20px; text-align: center; font-weight: 600; }
+  .empty-cart { text-align: center; color: #b0a094; padding: 60px 20px; font-size: 15px; }
+  .cart-footer {
+    padding: 18px 20px;
+    border-top: 2px solid #f0e6dc;
+    background: #fffaf5;
+  }
+  .total-row {
+    display: flex; justify-content: space-between;
+    font-size: 20px; font-weight: 700;
+    margin-bottom: 14px;
+  }
+  .total-row .total-val { color: #e8641e; }
+  .checkout-btn {
+    width: 100%;
+    background: #e8641e;
+    color: #fff;
+    border: none;
+    padding: 15px;
+    border-radius: 12px;
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  .checkout-btn:hover { background: #c9531a; }
+  .checkout-btn:disabled { background: #d8c8bc; cursor: not-allowed; }
+
+  /* Confirm modal */
+  .confirm {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    align-items: center; justify-content: center;
+    z-index: 200; padding: 20px;
+  }
+  .confirm.open { display: flex; }
+  .confirm-box {
+    background: #fff;
+    border-radius: 20px;
+    padding: 32px 28px;
+    max-width: 340px;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  }
+  .confirm-box .check { font-size: 56px; margin-bottom: 10px; }
+  .confirm-box h3 { font-size: 20px; margin-bottom: 8px; color: #2e8b3d; }
+  .confirm-box p { color: #7a6a5d; font-size: 14px; margin-bottom: 20px; }
+  .confirm-box button {
+    background: #e8641e; color: #fff;
+    border: none; padding: 12px 28px;
+    border-radius: 10px; font-size: 15px;
+    font-weight: 600; cursor: pointer;
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>🍳 ครัวอิ่มอร่อย</h1>
+  <button class="cart-btn" onclick="openCart()">
+    🛒 ตะกร้า <span class="cart-count" id="cartCount">0</span>
+  </button>
+</header>
+
+<main>
+  <div class="section-title">🍚 อาหารตามสั่ง</div>
+  <div class="grid" id="foodGrid"></div>
+
+  <div class="section-title">🥤 น้ำดื่ม / เครื่องดื่ม</div>
+  <div class="grid" id="drinkGrid"></div>
+
+  <div class="section-title">🍪 ขนม / ของกินเล่น</div>
+  <div class="grid" id="snackGrid"></div>
+</main>
+
+<div class="overlay" id="overlay" onclick="closeCart()"></div>
+<div class="cart-drawer" id="cartDrawer">
+  <div class="cart-header">
+    <h2>🛒 ตะกร้าของคุณ</h2>
+    <button class="close-btn" onclick="closeCart()">&times;</button>
+  </div>
+  <div class="cart-items" id="cartItems"></div>
+  <div class="cart-footer">
+    <div class="total-row">
+      <span>รวมทั้งหมด</span>
+      <span class="total-val" id="totalPrice">0 ฿</span>
+    </div>
+    <button class="checkout-btn" id="checkoutBtn" onclick="checkout()" disabled>ชำระเงิน</button>
+  </div>
+</div>
+
+<div class="confirm" id="confirm">
+  <div class="confirm-box">
+    <div class="check">✅</div>
+    <h3>สั่งอาหารสำเร็จ!</h3>
+    <p id="confirmText">ขอบคุณที่ใช้บริการ กรุณารอสักครู่</p>
+    <button onclick="closeConfirm()">ตกลง</button>
+  </div>
+</div>
+
+<script>
+const menu = {
+  food: [
+    { id: 'f1', emoji: '🍳', name: 'ข้าวกะเพราหมูไข่ดาว', desc: 'เผ็ดร้อนจัดจ้าน ไข่ดาวกรอบ', price: 60 },
+    { id: 'f2', emoji: '🍗', name: 'ข้าวผัดกระเทียมหมู', desc: 'หอมกระเทียมเจียว', price: 55 },
+    { id: 'f3', emoji: '🥘', name: 'ผัดซีอิ๊วหมู', desc: 'เส้นใหญ่ผัดไฟแรง', price: 55 },
+    { id: 'f4', emoji: '🍜', name: 'ราดหน้าหมูหมัก', desc: 'น้ำราดข้นเข้มข้น', price: 55 },
+    { id: 'f5', emoji: '🍤', name: 'ข้าวผัดกุ้ง', desc: 'กุ้งสดตัวโต', price: 70 },
+    { id: 'f6', emoji: '🥚', name: 'ข้าวไข่เจียวหมูสับ', desc: 'ไข่เจียวฟูกรอบ', price: 50 },
+    { id: 'f7', emoji: '🌶️', name: 'ผัดพริกแกงหมูกรอบ', desc: 'เผ็ดหอมพริกแกง', price: 65 },
+    { id: 'f8', emoji: '🍲', name: 'ต้มยำกุ้งน้ำข้น', desc: 'เปรี้ยวเผ็ดกลมกล่อม', price: 80 },
+    { id: 'f9', emoji: '🥬', name: 'ผัดผักบุ้งไฟแดง', desc: 'กรอบสดไฟแรง', price: 45 },
+    { id: 'f10', emoji: '🍛', name: 'ข้าวหมูกระเทียมพริกไทย', desc: 'หมูนุ่มหอมพริกไทย', price: 55 },
+  ],
+  drink: [
+    { id: 'd1', emoji: '💧', name: 'น้ำเปล่า', desc: 'ขวด 600 มล.', price: 10 },
+    { id: 'd2', emoji: '🥤', name: 'โค้ก', desc: 'กระป๋อง 325 มล.', price: 20 },
+    { id: 'd3', emoji: '🧋', name: 'ชาเย็น', desc: 'หวานมันเข้มข้น', price: 30 },
+    { id: 'd4', emoji: '🍊', name: 'น้ำส้มคั้นสด', desc: 'คั้นสดทุกแก้ว', price: 35 },
+    { id: 'd5', emoji: '☕', name: 'กาแฟเย็น', desc: 'หอมกลมกล่อม', price: 35 },
+    { id: 'd6', emoji: '🥥', name: 'น้ำมะพร้าว', desc: 'สดชื่นจากลูก', price: 30 },
+  ],
+  snack: [
+    { id: 's1', emoji: '🍟', name: 'เฟรนช์ฟรายส์', desc: 'กรอบนอกนุ่มใน', price: 40 },
+    { id: 's2', emoji: '🍗', name: 'ไก่ทอด (3 ชิ้น)', desc: 'กรอบฉ่ำ', price: 45 },
+    { id: 's3', emoji: '🍢', name: 'ลูกชิ้นทอด', desc: 'ไม้ละหลายลูก', price: 25 },
+    { id: 's4', emoji: '🥟', name: 'เกี๊ยวทอด', desc: 'กรอบจิ้มน้ำจิ้ม', price: 30 },
+    { id: 's5', emoji: '🍪', name: 'คุกกี้ช็อกโกแลต', desc: 'หวานกรุบกรอบ', price: 20 },
+    { id: 's6', emoji: '🍧', name: 'น้ำแข็งใสไอศกรีม', desc: 'เย็นชื่นใจ', price: 35 },
+  ]
+};
+
+const cart = {};
+const allItems = {};
+[...menu.food, ...menu.drink, ...menu.snack].forEach(i => allItems[i.id] = i);
+
+function renderMenu(list, gridId) {
+  const grid = document.getElementById(gridId);
+  grid.innerHTML = list.map(i => `
+    <div class="card">
+      <div class="emoji">${i.emoji}</div>
+      <h3>${i.name}</h3>
+      <div class="desc">${i.desc}</div>
+      <div class="bottom">
+        <span class="price">${i.price} ฿</span>
+        <button class="add-btn" onclick="addToCart('${i.id}')">+</button>
+      </div>
+    </div>`).join('');
+}
+renderMenu(menu.food, 'foodGrid');
+renderMenu(menu.drink, 'drinkGrid');
+renderMenu(menu.snack, 'snackGrid');
+
+function addToCart(id) {
+  cart[id] = (cart[id] || 0) + 1;
+  updateCart();
+}
+function changeQty(id, delta) {
+  cart[id] += delta;
+  if (cart[id] <= 0) delete cart[id];
+  updateCart();
+}
+function updateCart() {
+  const ids = Object.keys(cart);
+  const count = ids.reduce((s, id) => s + cart[id], 0);
+  const total = ids.reduce((s, id) => s + cart[id] * allItems[id].price, 0);
+  document.getElementById('cartCount').textContent = count;
+  document.getElementById('totalPrice').textContent = total + ' ฿';
+  document.getElementById('checkoutBtn').disabled = count === 0;
+
+  const box = document.getElementById('cartItems');
+  if (ids.length === 0) {
+    box.innerHTML = '<div class="empty-cart">🍽️<br>ยังไม่มีสินค้าในตะกร้า</div>';
+    return;
+  }
+  box.innerHTML = ids.map(id => {
+    const i = allItems[id];
+    return `
+    <div class="cart-item">
+      <span class="ci-emoji">${i.emoji}</span>
+      <div class="ci-info">
+        <div class="ci-name">${i.name}</div>
+        <div class="ci-price">${i.price} ฿ × ${cart[id]} = ${i.price * cart[id]} ฿</div>
+      </div>
+      <div class="qty-ctrl">
+        <button onclick="changeQty('${id}',-1)">−</button>
+        <span>${cart[id]}</span>
+        <button onclick="changeQty('${id}',1)">+</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function openCart() {
+  document.getElementById('cartDrawer').classList.add('open');
+  document.getElementById('overlay').classList.add('open');
+}
+function closeCart() {
+  document.getElementById('cartDrawer').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+}
+function checkout() {
+  const total = Object.keys(cart).reduce((s, id) => s + cart[id] * allItems[id].price, 0);
+  const count = Object.keys(cart).reduce((s, id) => s + cart[id], 0);
+  document.getElementById('confirmText').textContent =
+    `รวม ${count} รายการ ยอดชำระ ${total} ฿ — กรุณารอสักครู่`;
+  document.getElementById('confirm').classList.add('open');
+  for (const k in cart) delete cart[k];
+  updateCart();
+  closeCart();
+}
+function closeConfirm() {
+  document.getElementById('confirm').classList.remove('open');
+}
+updateCart();
+</script>
+</body>
+</html>
