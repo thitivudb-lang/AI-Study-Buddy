@@ -6,30 +6,63 @@
 <title>ครัวอิ่มอร่อย — สั่งอาหารออนไลน์</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --orange: #e8641e;
+    --orange-dark: #c9531a;
+    --bg: #fef6ee;
+    --text: #3a2e26;
+    --muted: #8a7a6d;
+  }
   body {
     font-family: 'Segoe UI', 'Sarabun', system-ui, sans-serif;
-    background: #fef6ee;
-    color: #3a2e26;
+    background: var(--bg);
+    color: var(--text);
     line-height: 1.5;
   }
   header {
-    background: #e8641e;
+    background: linear-gradient(120deg, #d9530f, #e8641e 45%, #f79438);
     color: #fff;
-    padding: 20px 24px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    padding: 16px 24px;
     position: sticky;
     top: 0;
     z-index: 50;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+    box-shadow: 0 4px 18px rgba(200,90,20,0.28);
   }
-  header h1 { font-size: 22px; display: flex; align-items: center; gap: 8px; }
+  .header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1100px;
+    margin: 0 auto;
+    gap: 16px;
+  }
+  header h1 { font-size: 22px; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .search-box {
+    flex: 1;
+    max-width: 420px;
+    position: relative;
+  }
+  .search-box input {
+    width: 100%;
+    padding: 11px 16px 11px 40px;
+    border: none;
+    border-radius: 30px;
+    font-size: 15px;
+    outline: none;
+    color: var(--text);
+  }
+  .search-box::before {
+    content: '🔍';
+    position: absolute;
+    left: 14px; top: 50%;
+    transform: translateY(-50%);
+    font-size: 15px;
+  }
   .cart-btn {
     background: #fff;
-    color: #e8641e;
+    color: var(--orange);
     border: none;
-    padding: 10px 18px;
+    padding: 11px 18px;
     border-radius: 30px;
     font-size: 15px;
     font-weight: 600;
@@ -37,11 +70,12 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    white-space: nowrap;
     transition: transform .15s;
   }
   .cart-btn:active { transform: scale(0.95); }
   .cart-count {
-    background: #e8641e;
+    background: var(--orange);
     color: #fff;
     border-radius: 50%;
     min-width: 22px;
@@ -52,65 +86,163 @@
     font-size: 13px;
     padding: 0 5px;
   }
-  main { max-width: 1000px; margin: 0 auto; padding: 24px 16px 60px; }
-  .section-title {
-    font-size: 20px;
-    font-weight: 700;
-    margin: 28px 0 14px;
-    color: #c9531a;
+  .cats {
+    display: flex;
+    gap: 8px;
+    max-width: 1100px;
+    margin: 12px auto 0;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+  .cat-tab {
+    background: rgba(255,255,255,0.22);
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: .15s;
+  }
+  .cat-tab.active { background: #fff; color: var(--orange); }
+
+  main { max-width: 1100px; margin: 0 auto; padding: 20px 16px 60px; }
+
+  .promo-banner {
+    background: linear-gradient(135deg, #fff3e6, #ffe4cc);
+    border: 2px dashed var(--orange);
+    border-radius: 16px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .promo-banner .pb-icon { font-size: 32px; }
+  .promo-banner .pb-text { flex: 1; min-width: 200px; }
+  .promo-banner .pb-text b { color: var(--orange-dark); }
+  .promo-codes { display: flex; gap: 8px; flex-wrap: wrap; }
+  .promo-chip {
+    background: #fff;
+    border: 1px solid var(--orange);
+    color: var(--orange-dark);
+    padding: 5px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: monospace;
+    letter-spacing: .5px;
+  }
+  .promo-chip:hover { background: #fff3e6; }
+
+  .section-title {
+    font-size: 21px;
+    font-weight: 800;
+    margin: 28px 0 16px;
+    color: var(--orange-dark);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0 10px 14px;
+    border-left: 5px solid var(--orange);
     border-bottom: 2px dashed #f0c9a8;
-    padding-bottom: 8px;
+    border-radius: 2px;
   }
   .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
     gap: 14px;
   }
   .card {
     background: #fff;
-    border-radius: 16px;
-    padding: 16px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 4px 14px rgba(180,110,50,0.08);
     display: flex;
     flex-direction: column;
-    transition: transform .15s, box-shadow .15s;
+    position: relative;
+    border: 1px solid #f4e3d3;
+    transition: transform .22s cubic-bezier(.34,1.56,.64,1), box-shadow .22s;
   }
-  .card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,0.1); }
-  .card .emoji { font-size: 40px; margin-bottom: 6px; }
-  .card h3 { font-size: 16px; margin-bottom: 4px; }
-  .card .desc { font-size: 13px; color: #8a7a6d; margin-bottom: 10px; flex: 1; }
+  .card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 14px 30px rgba(200,110,40,0.18);
+    border-color: #f7c9a3;
+  }
+  .card-thumb {
+    position: relative;
+    height: 96px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #fff1e3, #ffe0c4);
+    overflow: hidden;
+  }
+  .card-thumb::after {
+    content: '';
+    position: absolute;
+    width: 110px; height: 110px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.85), transparent 65%);
+    opacity: .8;
+  }
+  .card .emoji {
+    font-size: 48px;
+    position: relative;
+    z-index: 1;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.12));
+    transition: transform .25s cubic-bezier(.34,1.56,.64,1);
+  }
+  .card:hover .emoji { transform: scale(1.18) rotate(-4deg); }
+  .card-body { padding: 12px 15px 15px; display: flex; flex-direction: column; flex: 1; }
+  .badge {
+    position: absolute;
+    top: 10px; left: 10px;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    color: #fff;
+    z-index: 2;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+  }
+  .badge.hot { background: linear-gradient(135deg, #ff5b5b, #e23b3b); }
+  .badge.rec { background: linear-gradient(135deg, #3ac462, #2e9b4a); }
+  .card h3 { font-size: 15.5px; margin-bottom: 4px; line-height: 1.35; }
+  .card .desc { font-size: 12.5px; color: var(--muted); margin-bottom: 6px; flex: 1; }
+  .card .rating { font-size: 12px; color: #e8a020; margin-bottom: 10px; font-weight: 600; }
   .card .bottom { display: flex; justify-content: space-between; align-items: center; }
-  .price { font-size: 18px; font-weight: 700; color: #e8641e; }
+  .price { font-size: 19px; font-weight: 800; color: var(--orange); }
   .add-btn {
-    background: #e8641e;
+    background: linear-gradient(135deg, #f0872e, #e8641e);
     color: #fff;
     border: none;
-    width: 38px;
-    height: 38px;
+    width: 40px; height: 40px;
     border-radius: 50%;
     font-size: 22px;
     cursor: pointer;
-    transition: transform .15s, background .15s;
+    box-shadow: 0 4px 12px rgba(232,100,30,0.4);
+    transition: transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s;
   }
-  .add-btn:hover { background: #c9531a; }
-  .add-btn:active { transform: scale(0.85); }
+  .add-btn:hover { transform: scale(1.12); box-shadow: 0 6px 16px rgba(232,100,30,0.55); }
+  .add-btn:active { transform: scale(0.82); }
+  .no-result { text-align: center; color: var(--muted); padding: 50px 20px; font-size: 16px; grid-column: 1/-1; }
 
-  /* Cart Drawer */
   .overlay {
     position: fixed; inset: 0;
     background: rgba(0,0,0,0.4);
     opacity: 0; visibility: hidden;
-    transition: .25s;
-    z-index: 90;
+    transition: .25s; z-index: 90;
   }
   .overlay.open { opacity: 1; visibility: visible; }
   .cart-drawer {
     position: fixed;
-    top: 0; right: -420px;
-    width: 400px; max-width: 90vw;
+    top: 0; right: -440px;
+    width: 420px; max-width: 92vw;
     height: 100%;
     background: #fff;
     z-index: 100;
@@ -121,69 +253,91 @@
   }
   .cart-drawer.open { right: 0; }
   .cart-header {
-    padding: 20px;
-    background: #e8641e;
+    padding: 18px 20px;
+    background: var(--orange);
     color: #fff;
     display: flex;
     justify-content: space-between;
     align-items: center;
   }
   .cart-header h2 { font-size: 19px; }
-  .close-btn {
-    background: none; border: none; color: #fff;
-    font-size: 26px; cursor: pointer; line-height: 1;
-  }
+  .close-btn { background: none; border: none; color: #fff; font-size: 26px; cursor: pointer; line-height: 1; }
   .cart-items { flex: 1; overflow-y: auto; padding: 12px 16px; }
   .cart-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    display: flex; align-items: center; gap: 10px;
     padding: 12px 0;
     border-bottom: 1px solid #f0e6dc;
   }
   .cart-item .ci-emoji { font-size: 28px; }
   .cart-item .ci-info { flex: 1; }
   .cart-item .ci-name { font-size: 14px; font-weight: 600; }
-  .cart-item .ci-price { font-size: 13px; color: #8a7a6d; }
+  .cart-item .ci-price { font-size: 13px; color: var(--muted); }
   .qty-ctrl { display: flex; align-items: center; gap: 8px; }
   .qty-ctrl button {
     width: 28px; height: 28px;
-    border: 1px solid #e8641e;
-    background: #fff; color: #e8641e;
-    border-radius: 8px;
-    font-size: 16px; cursor: pointer;
+    border: 1px solid var(--orange);
+    background: #fff; color: var(--orange);
+    border-radius: 8px; font-size: 16px; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
   }
   .qty-ctrl button:active { background: #fdece0; }
   .qty-ctrl span { min-width: 20px; text-align: center; font-weight: 600; }
   .empty-cart { text-align: center; color: #b0a094; padding: 60px 20px; font-size: 15px; }
-  .cart-footer {
-    padding: 18px 20px;
-    border-top: 2px solid #f0e6dc;
-    background: #fffaf5;
+
+  .cart-footer { padding: 16px 20px; border-top: 2px solid #f0e6dc; background: #fffaf5; }
+  .promo-input-row { display: flex; gap: 8px; margin-bottom: 12px; }
+  .promo-input-row input {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid #e0d0c0;
+    border-radius: 10px;
+    font-size: 14px;
+    outline: none;
+    text-transform: uppercase;
   }
+  .promo-input-row button {
+    background: var(--text); color: #fff;
+    border: none; padding: 0 16px;
+    border-radius: 10px; font-size: 14px;
+    font-weight: 600; cursor: pointer;
+  }
+  .promo-msg { font-size: 13px; margin-bottom: 10px; min-height: 18px; }
+  .promo-msg.ok { color: #2e9b4a; }
+  .promo-msg.err { color: #e23b3b; }
+  .summary-line {
+    display: flex; justify-content: space-between;
+    font-size: 14px; color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .summary-line.discount { color: #2e9b4a; font-weight: 600; }
+  .free-ship-bar {
+    background: #f0e6dc;
+    border-radius: 20px;
+    height: 6px;
+    margin: 4px 0 10px;
+    overflow: hidden;
+  }
+  .free-ship-bar > div { background: #2e9b4a; height: 100%; transition: width .3s; }
+  .free-ship-note { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
   .total-row {
     display: flex; justify-content: space-between;
-    font-size: 20px; font-weight: 700;
-    margin-bottom: 14px;
+    font-size: 21px; font-weight: 700;
+    margin: 10px 0 14px;
+    padding-top: 10px;
+    border-top: 1px solid #f0e6dc;
   }
-  .total-row .total-val { color: #e8641e; }
+  .total-row .total-val { color: var(--orange); }
   .checkout-btn {
     width: 100%;
-    background: #e8641e;
-    color: #fff;
-    border: none;
-    padding: 15px;
-    border-radius: 12px;
-    font-size: 17px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background .15s;
+    background: var(--orange);
+    color: #fff; border: none;
+    padding: 15px; border-radius: 12px;
+    font-size: 17px; font-weight: 700;
+    cursor: pointer; transition: background .15s;
   }
-  .checkout-btn:hover { background: #c9531a; }
+  .checkout-btn:hover { background: var(--orange-dark); }
   .checkout-btn:disabled { background: #d8c8bc; cursor: not-allowed; }
 
-  /* Confirm modal */
   .confirm {
     position: fixed; inset: 0;
     background: rgba(0,0,0,0.5);
@@ -193,10 +347,8 @@
   }
   .confirm.open { display: flex; }
   .confirm-box {
-    background: #fff;
-    border-radius: 20px;
-    padding: 32px 28px;
-    max-width: 340px;
+    background: #fff; border-radius: 20px;
+    padding: 32px 28px; max-width: 360px;
     text-align: center;
     box-shadow: 0 10px 40px rgba(0,0,0,0.2);
   }
@@ -204,30 +356,52 @@
   .confirm-box h3 { font-size: 20px; margin-bottom: 8px; color: #2e8b3d; }
   .confirm-box p { color: #7a6a5d; font-size: 14px; margin-bottom: 20px; }
   .confirm-box button {
-    background: #e8641e; color: #fff;
+    background: var(--orange); color: #fff;
     border: none; padding: 12px 28px;
     border-radius: 10px; font-size: 15px;
     font-weight: 600; cursor: pointer;
   }
+  .toast {
+    position: fixed;
+    bottom: 24px; left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--text); color: #fff;
+    padding: 12px 22px; border-radius: 30px;
+    font-size: 14px; font-weight: 600;
+    z-index: 300; opacity: 0;
+    transition: .25s;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 </style>
 </head>
 <body>
 <header>
-  <h1>🍳 ครัวอิ่มอร่อย</h1>
-  <button class="cart-btn" onclick="openCart()">
-    🛒 ตะกร้า <span class="cart-count" id="cartCount">0</span>
-  </button>
+  <div class="header-top">
+    <h1>🍳 ครัวอิ่มอร่อย</h1>
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="ค้นหาเมนู... เช่น กะเพรา, ชาเย็น" oninput="renderAll()">
+    </div>
+    <button class="cart-btn" onclick="openCart()">
+      🛒 ตะกร้า <span class="cart-count" id="cartCount">0</span>
+    </button>
+  </div>
+  <div class="cats" id="catTabs"></div>
 </header>
 
 <main>
-  <div class="section-title">🍚 อาหารตามสั่ง</div>
-  <div class="grid" id="foodGrid"></div>
-
-  <div class="section-title">🥤 น้ำดื่ม / เครื่องดื่ม</div>
-  <div class="grid" id="drinkGrid"></div>
-
-  <div class="section-title">🍪 ขนม / ของกินเล่น</div>
-  <div class="grid" id="snackGrid"></div>
+  <div class="promo-banner">
+    <span class="pb-icon">🎁</span>
+    <div class="pb-text">
+      <b>โปรพิเศษวันนี้!</b> สั่งครบ 150฿ ส่งฟรี — แตะโค้ดเพื่อนำไปใช้
+    </div>
+    <div class="promo-codes">
+      <span class="promo-chip" onclick="applyChip('SAVE10')">SAVE10</span>
+      <span class="promo-chip" onclick="applyChip('LUNCH50')">LUNCH50</span>
+      <span class="promo-chip" onclick="applyChip('FREESHIP')">FREESHIP</span>
+    </div>
+  </div>
+  <div id="menuArea"></div>
 </main>
 
 <div class="overlay" id="overlay" onclick="closeCart()"></div>
@@ -238,10 +412,17 @@
   </div>
   <div class="cart-items" id="cartItems"></div>
   <div class="cart-footer">
-    <div class="total-row">
-      <span>รวมทั้งหมด</span>
-      <span class="total-val" id="totalPrice">0 ฿</span>
+    <div class="promo-input-row">
+      <input type="text" id="promoInput" placeholder="กรอกโค้ดส่วนลด">
+      <button onclick="applyPromo()">ใช้โค้ด</button>
     </div>
+    <div class="promo-msg" id="promoMsg"></div>
+    <div class="free-ship-bar"><div id="freeShipFill" style="width:0%"></div></div>
+    <div class="free-ship-note" id="freeShipNote">สั่งเพิ่มเพื่อรับส่งฟรี</div>
+    <div class="summary-line"><span>ค่าอาหาร</span><span id="subtotal">0 ฿</span></div>
+    <div class="summary-line" id="discountLine" style="display:none"><span></span><span></span></div>
+    <div class="summary-line"><span>ค่าจัดส่ง</span><span id="shipFee">0 ฿</span></div>
+    <div class="total-row"><span>รวมสุทธิ</span><span class="total-val" id="totalPrice">0 ฿</span></div>
     <button class="checkout-btn" id="checkoutBtn" onclick="checkout()" disabled>ชำระเงิน</button>
   </div>
 </div>
@@ -250,103 +431,274 @@
   <div class="confirm-box">
     <div class="check">✅</div>
     <h3>สั่งอาหารสำเร็จ!</h3>
-    <p id="confirmText">ขอบคุณที่ใช้บริการ กรุณารอสักครู่</p>
+    <p id="confirmText"></p>
     <button onclick="closeConfirm()">ตกลง</button>
   </div>
 </div>
 
+<div class="toast" id="toast"></div>
+
 <script>
-const menu = {
-  food: [
-    { id: 'f1', emoji: '🍳', name: 'ข้าวกะเพราหมูไข่ดาว', desc: 'เผ็ดร้อนจัดจ้าน ไข่ดาวกรอบ', price: 60 },
-    { id: 'f2', emoji: '🍗', name: 'ข้าวผัดกระเทียมหมู', desc: 'หอมกระเทียมเจียว', price: 55 },
-    { id: 'f3', emoji: '🥘', name: 'ผัดซีอิ๊วหมู', desc: 'เส้นใหญ่ผัดไฟแรง', price: 55 },
-    { id: 'f4', emoji: '🍜', name: 'ราดหน้าหมูหมัก', desc: 'น้ำราดข้นเข้มข้น', price: 55 },
-    { id: 'f5', emoji: '🍤', name: 'ข้าวผัดกุ้ง', desc: 'กุ้งสดตัวโต', price: 70 },
-    { id: 'f6', emoji: '🥚', name: 'ข้าวไข่เจียวหมูสับ', desc: 'ไข่เจียวฟูกรอบ', price: 50 },
-    { id: 'f7', emoji: '🌶️', name: 'ผัดพริกแกงหมูกรอบ', desc: 'เผ็ดหอมพริกแกง', price: 65 },
-    { id: 'f8', emoji: '🍲', name: 'ต้มยำกุ้งน้ำข้น', desc: 'เปรี้ยวเผ็ดกลมกล่อม', price: 80 },
-    { id: 'f9', emoji: '🥬', name: 'ผัดผักบุ้งไฟแดง', desc: 'กรอบสดไฟแรง', price: 45 },
-    { id: 'f10', emoji: '🍛', name: 'ข้าวหมูกระเทียมพริกไทย', desc: 'หมูนุ่มหอมพริกไทย', price: 55 },
-  ],
-  drink: [
-    { id: 'd1', emoji: '💧', name: 'น้ำเปล่า', desc: 'ขวด 600 มล.', price: 10 },
-    { id: 'd2', emoji: '🥤', name: 'โค้ก', desc: 'กระป๋อง 325 มล.', price: 20 },
-    { id: 'd3', emoji: '🧋', name: 'ชาเย็น', desc: 'หวานมันเข้มข้น', price: 30 },
-    { id: 'd4', emoji: '🍊', name: 'น้ำส้มคั้นสด', desc: 'คั้นสดทุกแก้ว', price: 35 },
-    { id: 'd5', emoji: '☕', name: 'กาแฟเย็น', desc: 'หอมกลมกล่อม', price: 35 },
-    { id: 'd6', emoji: '🥥', name: 'น้ำมะพร้าว', desc: 'สดชื่นจากลูก', price: 30 },
-  ],
-  snack: [
-    { id: 's1', emoji: '🍟', name: 'เฟรนช์ฟรายส์', desc: 'กรอบนอกนุ่มใน', price: 40 },
-    { id: 's2', emoji: '🍗', name: 'ไก่ทอด (3 ชิ้น)', desc: 'กรอบฉ่ำ', price: 45 },
-    { id: 's3', emoji: '🍢', name: 'ลูกชิ้นทอด', desc: 'ไม้ละหลายลูก', price: 25 },
-    { id: 's4', emoji: '🥟', name: 'เกี๊ยวทอด', desc: 'กรอบจิ้มน้ำจิ้ม', price: 30 },
-    { id: 's5', emoji: '🍪', name: 'คุกกี้ช็อกโกแลต', desc: 'หวานกรุบกรอบ', price: 20 },
-    { id: 's6', emoji: '🍧', name: 'น้ำแข็งใสไอศกรีม', desc: 'เย็นชื่นใจ', price: 35 },
-  ]
+const SHIP_FEE = 25;
+const FREE_SHIP_MIN = 150;
+
+const menu = [
+  { id:'f1', cat:'food', emoji:'🍳', name:'ข้าวกะเพราหมูไข่ดาว', desc:'เผ็ดร้อนจัดจ้าน ไข่ดาวกรอบ', price:60, rating:4.9, tag:'hot' },
+  { id:'f2', cat:'food', emoji:'🍗', name:'ข้าวผัดกระเทียมหมู', desc:'หอมกระเทียมเจียว', price:55, rating:4.6 },
+  { id:'f3', cat:'food', emoji:'🥘', name:'ผัดซีอิ๊วหมู', desc:'เส้นใหญ่ผัดไฟแรง', price:55, rating:4.5 },
+  { id:'f4', cat:'food', emoji:'🍜', name:'ราดหน้าหมูหมัก', desc:'น้ำราดข้นเข้มข้น', price:55, rating:4.4 },
+  { id:'f5', cat:'food', emoji:'🍤', name:'ข้าวผัดกุ้ง', desc:'กุ้งสดตัวโต', price:70, rating:4.7, tag:'rec' },
+  { id:'f6', cat:'food', emoji:'🥚', name:'ข้าวไข่เจียวหมูสับ', desc:'ไข่เจียวฟูกรอบ', price:50, rating:4.5 },
+  { id:'f7', cat:'food', emoji:'🌶️', name:'ผัดพริกแกงหมูกรอบ', desc:'เผ็ดหอมพริกแกง', price:65, rating:4.8, tag:'hot' },
+  { id:'f8', cat:'food', emoji:'🍲', name:'ต้มยำกุ้งน้ำข้น', desc:'เปรี้ยวเผ็ดกลมกล่อม', price:80, rating:4.9, tag:'rec' },
+  { id:'f9', cat:'food', emoji:'🥬', name:'ผัดผักบุ้งไฟแดง', desc:'กรอบสดไฟแรง', price:45, rating:4.3 },
+  { id:'f10', cat:'food', emoji:'🍛', name:'ข้าวหมูกระเทียมพริกไทย', desc:'หมูนุ่มหอมพริกไทย', price:55, rating:4.4 },
+  { id:'f11', cat:'food', emoji:'🍚', name:'ข้าวผัดหมู', desc:'จานคลาสสิกอิ่มคุ้ม', price:50, rating:4.2 },
+  { id:'f12', cat:'food', emoji:'🐔', name:'ข้าวผัดกะเพราไก่', desc:'ไก่สับผัดกะเพรากรอบ', price:55, rating:4.6 },
+  { id:'f13', cat:'food', emoji:'🥩', name:'เนื้อผัดน้ำมันหอย', desc:'เนื้อนุ่มซอสเข้มข้น', price:75, rating:4.5 },
+  { id:'f14', cat:'food', emoji:'🍳', name:'ข้าวไข่ข้นกุ้ง', desc:'ไข่ข้นนุ่มละมุน', price:70, rating:4.7, tag:'rec' },
+  { id:'f15', cat:'food', emoji:'🌿', name:'ผัดคะน้าหมูกรอบ', desc:'คะน้ากรอบหมูสามชั้น', price:60, rating:4.5 },
+  { id:'f16', cat:'food', emoji:'🍛', name:'ข้าวหน้าไก่เทอริยากิ', desc:'ไก่ย่างซอสญี่ปุ่น', price:65, rating:4.6 },
+  { id:'f17', cat:'food', emoji:'🍤', name:'ข้าวผัดต้มยำกุ้ง', desc:'ผัดเปรี้ยวเผ็ดหอม', price:70, rating:4.7, tag:'rec' },
+  { id:'f18', cat:'food', emoji:'🥘', name:'ผัดเผ็ดหมูป่า', desc:'เผ็ดร้อนเครื่องแกง', price:65, rating:4.5 },
+  { id:'f19', cat:'food', emoji:'🍜', name:'ก๋วยเตี๋ยวคั่วไก่', desc:'เส้นใหญ่คั่วหอม', price:55, rating:4.4 },
+  { id:'f20', cat:'food', emoji:'🐟', name:'ข้าวคะน้าปลาเค็ม', desc:'เค็มหอมกลมกล่อม', price:60, rating:4.4 },
+  { id:'f21', cat:'food', emoji:'🍳', name:'ข้าวผัดอเมริกัน', desc:'ไส้กรอกไก่ทอดไข่ดาว', price:70, rating:4.6 },
+  { id:'f22', cat:'food', emoji:'🥩', name:'ข้าวหมูทอดกระเทียม', desc:'หมูทอดกรอบหอม', price:60, rating:4.6, tag:'hot' },
+  { id:'f23', cat:'food', emoji:'🌶️', name:'ผัดฉ่าทะเล', desc:'เผ็ดหอมกระชายทะเลรวม', price:85, rating:4.8, tag:'rec' },
+  { id:'f24', cat:'food', emoji:'🍲', name:'แกงเขียวหวานไก่', desc:'หวานมันเข้มข้น', price:65, rating:4.5 },
+
+  { id:'d1', cat:'drink', emoji:'💧', name:'น้ำเปล่า', desc:'ขวด 600 มล.', price:10, rating:5.0 },
+  { id:'d2', cat:'drink', emoji:'🥤', name:'โค้ก', desc:'กระป๋อง 325 มล.', price:20, rating:4.6 },
+  { id:'d3', cat:'drink', emoji:'🧋', name:'ชาเย็น', desc:'หวานมันเข้มข้น', price:30, rating:4.8, tag:'hot' },
+  { id:'d4', cat:'drink', emoji:'🍊', name:'น้ำส้มคั้นสด', desc:'คั้นสดทุกแก้ว', price:35, rating:4.7 },
+  { id:'d5', cat:'drink', emoji:'☕', name:'กาแฟเย็น', desc:'หอมกลมกล่อม', price:35, rating:4.6 },
+  { id:'d6', cat:'drink', emoji:'🥥', name:'น้ำมะพร้าว', desc:'สดชื่นจากลูก', price:30, rating:4.5 },
+  { id:'d7', cat:'drink', emoji:'🍵', name:'ชาเขียวเย็น', desc:'หอมชาญี่ปุ่น', price:30, rating:4.4 },
+  { id:'d8', cat:'drink', emoji:'🍋', name:'น้ำมะนาวโซดา', desc:'ซ่าเปรี้ยวสดชื่น', price:30, rating:4.5 },
+  { id:'d9', cat:'drink', emoji:'🧃', name:'น้ำแดงมะนาว', desc:'หวานเย็นชื่นใจ', price:25, rating:4.3 },
+  { id:'d10', cat:'drink', emoji:'🥭', name:'น้ำปั่นมะม่วง', desc:'มะม่วงสุกปั่นเย็น', price:40, rating:4.7, tag:'hot' },
+  { id:'d11', cat:'drink', emoji:'🍓', name:'น้ำปั่นสตรอว์เบอร์รี', desc:'หวานอมเปรี้ยว', price:40, rating:4.6 },
+  { id:'d12', cat:'drink', emoji:'🧋', name:'ชานมไข่มุก', desc:'ไข่มุกหนึบเคี้ยวเพลิน', price:40, rating:4.8, tag:'rec' },
+  { id:'d13', cat:'drink', emoji:'🍫', name:'โกโก้เย็น', desc:'เข้มข้นหอมช็อกโกแลต', price:35, rating:4.5 },
+  { id:'d14', cat:'drink', emoji:'🥛', name:'นมสดเย็น', desc:'นมสดหวานมัน', price:30, rating:4.4 },
+  { id:'d15', cat:'drink', emoji:'🍹', name:'น้ำลิ้นจี่โซดา', desc:'ซ่าหวานหอม', price:35, rating:4.4 },
+  { id:'d16', cat:'drink', emoji:'🫖', name:'ชามะนาว', desc:'ชาเปรี้ยวสดชื่น', price:30, rating:4.3 },
+  { id:'d17', cat:'drink', emoji:'☕', name:'อเมริกาโน่เย็น', desc:'กาแฟดำเข้มสดชื่น', price:40, rating:4.6 },
+  { id:'d18', cat:'drink', emoji:'🥤', name:'สไปรท์', desc:'กระป๋อง 325 มล.', price:20, rating:4.4 },
+  { id:'d19', cat:'drink', emoji:'🍶', name:'น้ำเก๊กฮวย', desc:'หอมชื่นใจ', price:25, rating:4.4 },
+  { id:'d20', cat:'drink', emoji:'🧊', name:'น้ำแข็งเปล่า', desc:'ถุงใหญ่', price:10, rating:5.0 },
+
+  { id:'s1', cat:'snack', emoji:'🍟', name:'เฟรนช์ฟรายส์', desc:'กรอบนอกนุ่มใน', price:40, rating:4.7, tag:'hot' },
+  { id:'s2', cat:'snack', emoji:'🍗', name:'ไก่ทอด (3 ชิ้น)', desc:'กรอบฉ่ำ', price:45, rating:4.8, tag:'rec' },
+  { id:'s3', cat:'snack', emoji:'🍢', name:'ลูกชิ้นทอด', desc:'ไม้ละหลายลูก', price:25, rating:4.4 },
+  { id:'s4', cat:'snack', emoji:'🥟', name:'เกี๊ยวทอด', desc:'กรอบจิ้มน้ำจิ้ม', price:30, rating:4.5 },
+  { id:'s5', cat:'snack', emoji:'🍪', name:'คุกกี้ช็อกโกแลต', desc:'หวานกรุบกรอบ', price:20, rating:4.3 },
+  { id:'s6', cat:'snack', emoji:'🍧', name:'น้ำแข็งใสไอศกรีม', desc:'เย็นชื่นใจ', price:35, rating:4.6 },
+  { id:'s7', cat:'snack', emoji:'🌭', name:'ไส้กรอกทอด', desc:'ฉ่ำเด้งกรอบ', price:30, rating:4.5 },
+  { id:'s8', cat:'snack', emoji:'🧇', name:'ขนมปังปิ้งเนยนม', desc:'หอมเนยหวานนม', price:25, rating:4.4 },
+  { id:'s9', cat:'snack', emoji:'🍤', name:'กุ้งชุบแป้งทอด', desc:'กรอบตัวโต', price:50, rating:4.7, tag:'rec' },
+  { id:'s10', cat:'snack', emoji:'🥔', name:'มันฝรั่งทอดเกลือ', desc:'กรอบเค็มกำลังดี', price:35, rating:4.5 },
+  { id:'s11', cat:'snack', emoji:'🧀', name:'มอสซาเรลลาสติ๊ก', desc:'ชีสยืดกรอบนอก', price:45, rating:4.7, tag:'hot' },
+  { id:'s12', cat:'snack', emoji:'🍤', name:'ปอเปี๊ยะทอด', desc:'ไส้แน่นกรอบ', price:30, rating:4.4 },
+  { id:'s13', cat:'snack', emoji:'🥠', name:'ขนมจีบ (4 ชิ้น)', desc:'นึ่งร้อนนุ่ม', price:35, rating:4.4 },
+  { id:'s14', cat:'snack', emoji:'🍦', name:'ไอศกรีมซันเดย์', desc:'ราดช็อกโกแลตถั่ว', price:45, rating:4.6 },
+  { id:'s15', cat:'snack', emoji:'🍮', name:'พุดดิ้งคาราเมล', desc:'นุ่มละมุนหอมไข่', price:30, rating:4.5 },
+  { id:'s16', cat:'snack', emoji:'🍩', name:'โดนัทน้ำตาล', desc:'นุ่มหวานหอม', price:25, rating:4.4 },
+  { id:'s17', cat:'snack', emoji:'🧁', name:'คัพเค้กช็อกโกแลต', desc:'ครีมนุ่มหวานมัน', price:35, rating:4.5 },
+  { id:'s18', cat:'snack', emoji:'🍰', name:'เค้กชิฟฟอนใบเตย', desc:'เนื้อนุ่มหอมใบเตย', price:35, rating:4.6 },
+  { id:'s19', cat:'snack', emoji:'🥞', name:'แพนเค้กน้ำผึ้ง', desc:'นุ่มหอมราดน้ำผึ้ง', price:40, rating:4.5 },
+  { id:'s20', cat:'snack', emoji:'🌰', name:'ถั่วทอดสมุนไพร', desc:'กรอบเคี้ยวเพลิน', price:20, rating:4.3 },
+  { id:'s21', cat:'snack', emoji:'🍡', name:'บัวลอยน้ำขิง', desc:'อุ่นหอมขิง', price:30, rating:4.4 },
+  { id:'s22', cat:'snack', emoji:'🍨', name:'ไอศกรีมกะทิ', desc:'หอมมันสไตล์ไทย', price:35, rating:4.6, tag:'rec' },
+];
+
+const categories = [
+  { key:'all', label:'ทั้งหมด', icon:'🍽️' },
+  { key:'food', label:'อาหารตามสั่ง', icon:'🍚' },
+  { key:'drink', label:'เครื่องดื่ม', icon:'🥤' },
+  { key:'snack', label:'ของกินเล่น', icon:'🍪' },
+];
+const catTitles = { food:'🍚 อาหารตามสั่ง', drink:'🥤 เครื่องดื่ม', snack:'🍪 ของกินเล่น / ขนม' };
+
+const promos = {
+  'SAVE10':   { type:'percent', value:10, min:0,   label:'ลด 10%' },
+  'LUNCH50':  { type:'baht',    value:50, min:200, label:'ลด 50฿ (ขั้นต่ำ 200฿)' },
+  'FREESHIP': { type:'ship',    value:0,  min:0,   label:'ส่งฟรี' },
 };
 
 const cart = {};
 const allItems = {};
-[...menu.food, ...menu.drink, ...menu.snack].forEach(i => allItems[i.id] = i);
+menu.forEach(i => allItems[i.id] = i);
+let activeCat = 'all';
+let activePromo = null;
 
-function renderMenu(list, gridId) {
-  const grid = document.getElementById(gridId);
-  grid.innerHTML = list.map(i => `
-    <div class="card">
-      <div class="emoji">${i.emoji}</div>
-      <h3>${i.name}</h3>
-      <div class="desc">${i.desc}</div>
-      <div class="bottom">
-        <span class="price">${i.price} ฿</span>
-        <button class="add-btn" onclick="addToCart('${i.id}')">+</button>
-      </div>
-    </div>`).join('');
+document.getElementById('catTabs').innerHTML = categories.map(c =>
+  `<button class="cat-tab ${c.key==='all'?'active':''}" data-cat="${c.key}" onclick="setCat('${c.key}')">${c.icon} ${c.label}</button>`
+).join('');
+
+function setCat(key) {
+  activeCat = key;
+  document.querySelectorAll('.cat-tab').forEach(t =>
+    t.classList.toggle('active', t.dataset.cat === key));
+  renderAll();
 }
-renderMenu(menu.food, 'foodGrid');
-renderMenu(menu.drink, 'drinkGrid');
-renderMenu(menu.snack, 'snackGrid');
+
+function renderAll() {
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  const area = document.getElementById('menuArea');
+  const groups = activeCat === 'all' ? ['food','drink','snack'] : [activeCat];
+  let html = '';
+  let totalShown = 0;
+
+  groups.forEach(g => {
+    const items = menu.filter(i => i.cat === g &&
+      (q === '' || i.name.toLowerCase().includes(q) || i.desc.toLowerCase().includes(q)));
+    if (items.length === 0) return;
+    totalShown += items.length;
+    html += `<div class="section-title">${catTitles[g]}</div><div class="grid">`;
+    html += items.map(cardHTML).join('');
+    html += `</div>`;
+  });
+
+  if (totalShown === 0) {
+    html = `<div class="grid"><div class="no-result">😕 ไม่พบเมนู "${q}"<br>ลองค้นหาคำอื่นดูนะครับ</div></div>`;
+  }
+  area.innerHTML = html;
+}
+
+function cardHTML(i) {
+  const badge = i.tag === 'hot' ? '<span class="badge hot">🔥 ยอดนิยม</span>'
+              : i.tag === 'rec' ? '<span class="badge rec">⭐ แนะนำ</span>' : '';
+  return `
+    <div class="card">
+      <div class="card-thumb">
+        ${badge}
+        <div class="emoji">${i.emoji}</div>
+      </div>
+      <div class="card-body">
+        <h3>${i.name}</h3>
+        <div class="desc">${i.desc}</div>
+        <div class="rating">⭐ ${i.rating.toFixed(1)}</div>
+        <div class="bottom">
+          <span class="price">${i.price} ฿</span>
+          <button class="add-btn" onclick="addToCart('${i.id}')">+</button>
+        </div>
+      </div>
+    </div>`;
+}
 
 function addToCart(id) {
   cart[id] = (cart[id] || 0) + 1;
   updateCart();
+  showToast(`เพิ่ม ${allItems[id].name} แล้ว`);
 }
 function changeQty(id, delta) {
   cart[id] += delta;
   if (cart[id] <= 0) delete cart[id];
   updateCart();
 }
+
+function getSubtotal() {
+  return Object.keys(cart).reduce((s, id) => s + cart[id] * allItems[id].price, 0);
+}
+
+function computeTotals() {
+  const subtotal = getSubtotal();
+  let discount = 0;
+  let ship = subtotal >= FREE_SHIP_MIN ? 0 : (subtotal > 0 ? SHIP_FEE : 0);
+  let discountLabel = '';
+
+  if (activePromo && subtotal >= promos[activePromo].min) {
+    const p = promos[activePromo];
+    if (p.type === 'percent') { discount = Math.round(subtotal * p.value / 100); discountLabel = `ส่วนลด ${activePromo} (-${p.value}%)`; }
+    else if (p.type === 'baht') { discount = p.value; discountLabel = `ส่วนลด ${activePromo}`; }
+    else if (p.type === 'ship') { ship = 0; discountLabel = `ส่งฟรี (${activePromo})`; }
+  }
+  const total = Math.max(0, subtotal - discount) + ship;
+  return { subtotal, discount, ship, total, discountLabel };
+}
+
 function updateCart() {
   const ids = Object.keys(cart);
   const count = ids.reduce((s, id) => s + cart[id], 0);
-  const total = ids.reduce((s, id) => s + cart[id] * allItems[id].price, 0);
   document.getElementById('cartCount').textContent = count;
-  document.getElementById('totalPrice').textContent = total + ' ฿';
-  document.getElementById('checkoutBtn').disabled = count === 0;
 
   const box = document.getElementById('cartItems');
   if (ids.length === 0) {
     box.innerHTML = '<div class="empty-cart">🍽️<br>ยังไม่มีสินค้าในตะกร้า</div>';
-    return;
+  } else {
+    box.innerHTML = ids.map(id => {
+      const i = allItems[id];
+      return `
+      <div class="cart-item">
+        <span class="ci-emoji">${i.emoji}</span>
+        <div class="ci-info">
+          <div class="ci-name">${i.name}</div>
+          <div class="ci-price">${i.price} ฿ × ${cart[id]} = ${i.price * cart[id]} ฿</div>
+        </div>
+        <div class="qty-ctrl">
+          <button onclick="changeQty('${id}',-1)">−</button>
+          <span>${cart[id]}</span>
+          <button onclick="changeQty('${id}',1)">+</button>
+        </div>
+      </div>`;
+    }).join('');
   }
-  box.innerHTML = ids.map(id => {
-    const i = allItems[id];
-    return `
-    <div class="cart-item">
-      <span class="ci-emoji">${i.emoji}</span>
-      <div class="ci-info">
-        <div class="ci-name">${i.name}</div>
-        <div class="ci-price">${i.price} ฿ × ${cart[id]} = ${i.price * cart[id]} ฿</div>
-      </div>
-      <div class="qty-ctrl">
-        <button onclick="changeQty('${id}',-1)">−</button>
-        <span>${cart[id]}</span>
-        <button onclick="changeQty('${id}',1)">+</button>
-      </div>
-    </div>`;
-  }).join('');
+
+  const t = computeTotals();
+
+  const pct = Math.min(100, Math.round(t.subtotal / FREE_SHIP_MIN * 100));
+  document.getElementById('freeShipFill').style.width = pct + '%';
+  const note = document.getElementById('freeShipNote');
+  if (t.subtotal >= FREE_SHIP_MIN) note.textContent = '🎉 คุณได้รับส่งฟรีแล้ว!';
+  else if (t.subtotal > 0) note.textContent = `อีก ${FREE_SHIP_MIN - t.subtotal} ฿ รับส่งฟรี`;
+  else note.textContent = 'สั่งเพิ่มเพื่อรับส่งฟรี';
+
+  document.getElementById('subtotal').textContent = t.subtotal + ' ฿';
+  document.getElementById('shipFee').textContent = t.ship === 0 ? 'ฟรี' : t.ship + ' ฿';
+
+  const dLine = document.getElementById('discountLine');
+  if (t.discount > 0) {
+    dLine.style.display = 'flex';
+    dLine.classList.add('discount');
+    dLine.children[0].textContent = t.discountLabel;
+    dLine.children[1].textContent = '-' + t.discount + ' ฿';
+  } else {
+    dLine.style.display = 'none';
+  }
+
+  document.getElementById('totalPrice').textContent = t.total + ' ฿';
+  document.getElementById('checkoutBtn').disabled = count === 0;
 }
+
+function applyPromo() {
+  const inp = document.getElementById('promoInput');
+  const code = inp.value.trim().toUpperCase();
+  const msg = document.getElementById('promoMsg');
+  if (!code) { msg.className = 'promo-msg err'; msg.textContent = 'กรุณากรอกโค้ด'; return; }
+  const p = promos[code];
+  if (!p) { msg.className = 'promo-msg err'; msg.textContent = '❌ ไม่พบโค้ดนี้'; activePromo = null; updateCart(); return; }
+  const subtotal = getSubtotal();
+  if (subtotal < p.min) {
+    msg.className = 'promo-msg err';
+    msg.textContent = `⚠️ โค้ดนี้ใช้ได้เมื่อสั่งครบ ${p.min} ฿`;
+    activePromo = null; updateCart(); return;
+  }
+  activePromo = code;
+  msg.className = 'promo-msg ok';
+  msg.textContent = `✅ ใช้โค้ด ${code} — ${p.label}`;
+  updateCart();
+}
+
+function applyChip(code) {
+  document.getElementById('promoInput').value = code;
+  if (navigator.clipboard) navigator.clipboard.writeText(code).catch(()=>{});
+  showToast(`เลือกโค้ด ${code} แล้ว`);
+  openCart();
+  applyPromo();
+}
+
 function openCart() {
   document.getElementById('cartDrawer').classList.add('open');
   document.getElementById('overlay').classList.add('open');
@@ -355,19 +707,32 @@ function closeCart() {
   document.getElementById('cartDrawer').classList.remove('open');
   document.getElementById('overlay').classList.remove('open');
 }
+
 function checkout() {
-  const total = Object.keys(cart).reduce((s, id) => s + cart[id] * allItems[id].price, 0);
+  const t = computeTotals();
   const count = Object.keys(cart).reduce((s, id) => s + cart[id], 0);
   document.getElementById('confirmText').textContent =
-    `รวม ${count} รายการ ยอดชำระ ${total} ฿ — กรุณารอสักครู่`;
+    `รวม ${count} รายการ • ยอดชำระ ${t.total} ฿${t.discount>0?` (ประหยัด ${t.discount} ฿)`:''} — กรุณารอสักครู่`;
   document.getElementById('confirm').classList.add('open');
   for (const k in cart) delete cart[k];
+  activePromo = null;
+  document.getElementById('promoInput').value = '';
+  document.getElementById('promoMsg').textContent = '';
   updateCart();
   closeCart();
 }
-function closeConfirm() {
-  document.getElementById('confirm').classList.remove('open');
+function closeConfirm() { document.getElementById('confirm').classList.remove('open'); }
+
+let toastTimer;
+function showToast(text) {
+  const t = document.getElementById('toast');
+  t.textContent = text;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 1600);
 }
+
+renderAll();
 updateCart();
 </script>
 </body>
