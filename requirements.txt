@@ -1,0 +1,8 @@
+streamlit
+ollama
+numpy
+pypdf
+pymupdf
+python-docx
+python-pptx
+tzdata
