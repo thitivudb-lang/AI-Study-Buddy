@@ -5,8 +5,10 @@ AI Study Buddy  -  วิธีติดตั้งและใช้งาน
 - คอมพิวเตอร์ Windows 10/11 (หรือ Mac)
 - โปรแกรม Ollama ติดตั้งแล้วและเปิดอยู่ (ดาวน์โหลดที่ https://ollama.com/download)
 - โมเดลที่โหลดไว้แล้ว (พิมพ์ใน PowerShell ครั้งเดียว ต้องต่อเน็ตตอนโหลด):
-    ollama pull gemma3:4b
-    ollama pull bge-m3
+    bge-m3:latest        790764642607    1.2 GB    
+    qwen3-vl:4b          1343d82ebee3    3.3 GB    
+    qwen3:8b             500a1f067a9f    5.2 GB    
+    qwen3:4b-instruct    0edcdef34593    2.5 GB    
 - Python 3.10 ขึ้นไป (ถ้ายังไม่มี ตัวเปิดโปรแกรมจะพยายามติดตั้งให้เอง)
 - ไม่ต้องใช้ API key  หลังติดตั้งครั้งแรกเสร็จ ใช้งานได้โดยไม่ต้องต่ออินเทอร์เน็ต
 
